@@ -52,7 +52,7 @@
                <el-button type="text" class="button" @click="handleViewItems(p.productId)">Details</el-button>
 
               <el-tooltip class="item" effect="dark" content="删除" placement="right">
-                <el-button class="i-delete-button" style="padding: 0;" @click="handleDelete(p.index)">
+                <el-button class="i-delete-button" style="padding: 0;" @click="handleDelete(p.productId)">
                   <svg-icon icon-class="delete" style="width: 1.3em;height: 1.3em;" ></svg-icon>
                 </el-button>
               </el-tooltip>
@@ -76,7 +76,7 @@
 </template>
 
 <script>
-import {getProducts} from '@/api/product'
+import {getProducts,deleteProduct,getProductDetail} from '@/api/product'
 import categoryList from '@/config/category-config'
 
 export default {
@@ -89,6 +89,7 @@ export default {
       p_categoryId : 0,
 
       productList: [],
+      p_itemList: [],
       inital_products:[],
       dialogFormVisible:false,
       currentDate: new Date(),
@@ -142,6 +143,11 @@ export default {
         console.log(this.productList)
         this.total = response.data.data.totalSize;
       }
+      else if(response.data.code == 30001){
+        this.$message.error(response.data.msg)
+        this.productList.splice(0,this.productList.length);
+        console.log(response.data.msg)
+      }
       else{
         console.log(response.data.msg)
         this.loading = false;
@@ -167,8 +173,68 @@ export default {
     handleAdd(){
       this.$router.push({path:'/pms/addProduct'});
     },
-    handleDelete(index){
-      this.productList.splice(index,1);
+    handleDelete(pid){
+      getProductDetail(pid).then(response => {
+        if(response.data.code == 1){
+          this.p_itemList=response.data.data.itemList;
+          console.log(this.p_itemList)
+
+          this.$confirm('商城中还有该品种的宠物，继续操作则会将对应的宠物全部删除, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                  }).then(() => {
+                    this.doDelete(pid);
+                  }).catch(() => {
+                    this.$message({
+                      type: 'info',
+                      message: '已取消删除'
+                    });
+                  });
+        }
+        else{
+          this.$confirm('此操作将永久删除该品种, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                  }).then(() => {
+                    this.doDelete(pid);
+                  }).catch(() => {
+                    this.$message({
+                      type: 'info',
+                      message: '已取消删除'
+                    });
+                  });
+          console.log(response.data.msg)
+        }
+      }).catch((response) => {
+        console.log(response);
+        this.loading = false
+      })
+
+
+    },
+    doDelete(pid){
+      deleteProduct(pid).then(response => {
+        console.log(response);
+        console.log(response.data.code)
+        if(response.data.code == 1){
+          this.getList();
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          });
+        }
+        else{
+          this.$message({
+            type: 'warn',
+            message: response.data.msg
+          });
+        }
+      }).catch((response) => {
+            this.loading = false;
+            console.log(response)
+         })
     },
 
     // 初始页currentPage、初始每页数据数pagesize和数据data
@@ -185,6 +251,12 @@ export default {
 
     handleViewItems(pid){
       this.$router.push({path:'/pms/viewProduct',query:{productId:pid}})
+    },
+    findByIndex(index,list){
+      list.forEach(i => {
+        if(i.index == index)
+          return i;
+      });
     }
   }
 }

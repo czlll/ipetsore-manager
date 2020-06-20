@@ -21,18 +21,18 @@
 
       <el-form-item label="Image：">
         <el-upload
-          class="upload-demo"
           action="https://jsonplaceholder.typicode.com/posts/"
+          accept="image/jpg,image/png,image/jpeg"
+          :before-upload="beforeUpload"
           :on-preview="handlePreview"
           :on-remove="handleRemove"
-          :on-success="handlesuccess"
-          :on-error="handdleError"
+          :on-change="handlesuccess"
           :file-list="fileList"
+          :auto-upload="false"
           list-type="picture">
-          <el-button size="small" type="primary">点击上传</el-button>
+          <el-button size="small" type="primary" :disabled="!enabledUploadBtn">点击上传</el-button>
           <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
         </el-upload>
-        <!-- <single-upload v-model="edit_product.imageUrl"></single-upload> -->
       </el-form-item>
 
       <el-form-item label="分类描述：">
@@ -53,17 +53,17 @@
 <script>
   import categoryList from '@/config/category-config'
   import {addProduct,updateProduct} from '@/api/product'
-  // import SingleUpload from '@/components/Upload/singleUpload';
+  import {uploadImgToBase64} from '@/utils/uploadImgToBase64'
 
   const defaultProduct = {
     name:'',
     categoryId:'',
-    imgUrl:'',
+    imgUrl:null,
     description: ''
   }
 
   export default {
-    name: "updateProduct",
+    name: "productDetail",
     props: {
       isEdit: {
         type: Boolean,
@@ -80,6 +80,7 @@
         fileList:[],
         dialogVisible: false,
         dialogImageUrl: '',
+        enabledUploadBtn: true,
         rules: {
           name: [
             {required: true, message: '请输入品种名', trigger: 'blur'},
@@ -149,7 +150,7 @@
                       duration:2000
                     });
                   }
-                
+
                 }).catch((response) => {
                   console.log(response);
                   this.loading = false
@@ -178,7 +179,12 @@
           this.fileList = [];
         });
       },
+      beforeUpload(file) {
+        this.enabledUploadBtn = false;
+      },
       handleRemove(file, fileList) {
+        this.enabledUploadBtn = true;
+        this.edit_product.imgUrl = null;
         console.log(file, fileList);
       },
       handlePreview(file) {
@@ -186,10 +192,21 @@
         this.dialogVisible = true;
         console.log(file);
       },
-      handlesuccess(response, file, fileList){
+      handlesuccess(file, fileList){
+        this.enabledUploadBtn = false;
+        console.log(file)
         this.edit_product.imgUrl = file;
+        // uploadImgToBase64(file.raw).then(data => {
+        //   this.edit_product.imgUrl = data.result;
+        //   console.log(data)
+        //   console.log(this.edit_product.imgUrl)
+        // });
+        // const data = await uploadImgToBase64(file.raw);
+        // this.edit_product.imageUrl = data.result;
+
       },
       handdleError(err, file, fileList){
+        this.enabledUploadBtn = true;
         alert('上传失败')
       }
   },

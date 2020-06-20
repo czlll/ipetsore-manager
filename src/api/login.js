@@ -6,6 +6,6 @@ import http from '../utils/http'
 
 export function login(username, password) {
   console.log(username);
-  return http.post('manager/login',{username, password})
+  return http.post('authentic/login',{username, password})
 }
 

@@ -122,33 +122,25 @@
         this.$refs.loginForm.validate(valid => {
           if (valid) {
             this.loading = true;
-            console.log('czlll')
-            this.$store.dispatch('dologin').then(() => {
-              // setCookie("username",this.loginForm.username,15);
-              // setCookie("password",this.loginForm.password,15);
-              this.$router.push({path:'/'})
-            }).catch(() => {
-              this.loading = false
-            })
-            
-            // login(this.loginForm.username,this.loginForm.password).then(res => {
-            //   console.log(res);
-            //   if(res.data === true){
-                
-            //     // this.$store.dispatch('dologin').then(() => {
-            //     //   // setCookie("username",this.loginForm.username,15);
-            //     //   // setCookie("password",this.loginForm.password,15);
-            //     // this.$router.push({path:'/'})
-            //     // }).catch(() => {
-            //     //   this.loading = false
-            //     // })
-            //   }
-            //   else{
-            //     alert("登录失败");
-            //     // this.loading = false;
-            //     return false
-            //   }
-            // });
+            console.log('开始登录')
+
+            login(this.loginForm.username,this.loginForm.password).then(res => {
+              console.log(res);
+              if(res.data.code == 1){
+                this.$store.dispatch('dologin').then(() => {
+                  console.log('登录成功')
+                  window.location.reload()
+                  this.$router.push({path:'/'})
+                }).catch(() => {
+                  this.loading = false
+                })
+              }
+              else{
+                alert("登录失败");
+                this.loading = false;
+                return false
+              }
+            });
           } else {
             console.log('参数验证不合法！');
             return false

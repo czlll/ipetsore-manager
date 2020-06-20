@@ -17,6 +17,13 @@ module.exports = {
               pathRewrite: {
                 '^/manager': 'manager'
               }
+            },
+      '/authentic': { //权限验证
+              target: 'http://127.0.0.1:8081',
+              changeOrigin: true,
+              pathRewrite: {
+                '^/authentic': 'authentic'
+              }
             }
     },
 

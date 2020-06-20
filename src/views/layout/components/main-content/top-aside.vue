@@ -20,13 +20,17 @@
                 </el-breadcrumb-item>
             </transition-group>
         </el-breadcrumb>
+
         <div class="aside__top--right">
             <div class="email">
-                <span class="iconfont icon-email"><i>40</i></span>
+                <span class="iconfont">
+                  <svg-icon icon-class="order-icon" style="vertical-align: middle;margin-top: 3px;"></svg-icon>
+                  <i>40</i>
+                </span>
             </div>
             <div class="user-msg">
-                <img class="user-img" :src="require('@/assets/img/a.png')" alt="">
-                <span class="user-name">Lily-叶</span>
+                <img class="user-img" :src="require('@/assets/img/avatar.png')" alt="">
+                <span class="user-name">Admin</span>
                 <el-dropdown trigger="click" placement="top">
                     <span class="el-dropdown-link">
                         <i class="el-icon-arrow-down el-icon--right"></i>
@@ -37,8 +41,10 @@
                     </el-dropdown-menu>
                 </el-dropdown>
             </div>
-            <div class="quit-system" @click="loginOut">
-                <span class="iconfont icon-quit"></span>
+            <div class="quit-system" @click="handleLoginOut">
+                <span class="iconfont">
+                  <svg-icon icon-class="logout" style="width:1.3em;height:1.3em;vertical-align: middle;margin-top: 3px;"></svg-icon>
+                </span>
             </div>
         </div>
     </aside>
@@ -58,8 +64,14 @@ export default {
         toggleNavCollapse() {
             this.$store.commit('toggleNavCollapse')
         },
-        loginOut() {
-            this.$store.commit('LOGIN_OUT')
+        handleLoginOut() {
+            this.$store.dispatch('dologout').then(() => {
+              console.log('退出登录')
+            this.$router.push({path:'/'})
+            }).catch(() => {
+              this.loading = false
+            })
+            
             /* 防止切换角色时addRoutes重复添加路由导致出现警告 */
             window.location.reload()
         }
