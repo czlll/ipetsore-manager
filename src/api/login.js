@@ -5,7 +5,7 @@ import http from '../utils/http'
  */
 
 export function login(username, password) {
-  console.log('username: ' + username + ' password: ' + password);
+  console.log(username);
   return http.post('authentic/login',{username, password})
 }
 

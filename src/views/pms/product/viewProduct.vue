@@ -23,23 +23,30 @@
       ref="filterTable"
       :data="itemList"
       stripe
-      style="width: 65%;margin-bottom: 30px;">
+      style="width: 70%;margin-bottom: 30px;">
       <el-table-column
-        prop="itemId"
         label="itemId"
         column-key="itemId"
-        sortable
-        width="150">
+        sortable>
+        <template slot-scope="scope">
+          <el-button @click="handleViewItem(scope.row)" type="text" size="small">
+            {{scope.row.itemId}}
+          </el-button>
+        </template>
       </el-table-column>
       <el-table-column
         prop="listPrice"
         label="listPrice"
-        sortable
-        width="150">
+        sortable>
       </el-table-column>
       <el-table-column
         prop="unitCost"
         label="unitCost"
+        sortable>
+      </el-table-column>
+      <el-table-column
+        prop="quantity"
+        label="quantity"
         sortable>
       </el-table-column>
       <el-table-column
@@ -50,6 +57,16 @@
         prop="status"
         label="status">
       </el-table-column>
+      <el-table-column
+            fixed="right"
+            label="操作"
+            width="100">
+            <template slot-scope="scope">
+              <!-- <el-button @click="handleViewItem(scope.row)" type="text" size="small">查看</el-button> -->
+              <el-button type="text" size="small" @click="handleEditQuantity(scope.row)">编辑</el-button>
+              <el-button type="text" size="small" @click="handleDeleteItem(scope.row)">删除</el-button>
+            </template>
+          </el-table-column>
     </el-table>
 
      <el-pagination
@@ -63,11 +80,28 @@
        style="margin-bottom: 30px;">
      </el-pagination>
      </div>
+
+     <el-dialog title="编辑库存" :visible.sync="dialogFormVisible" class="edit-item-dialog">
+       <el-form :model="editItem" class="edit-item-form">
+         <el-form-item label="库存">
+           <el-input-number
+            v-model="editItem.quantity"
+            controls-position="right"
+            :step="1"
+            :min="0" >
+           </el-input-number>
+         </el-form-item>
+       </el-form>
+       <div slot="footer" class="dialog-footer">
+         <el-button @click="dialogFormVisible = false">取 消</el-button>
+         <el-button type="primary" @click="handleConfirmEdit">确 定</el-button>
+       </div>
+     </el-dialog>
   </div>
 </template>
 
 <script>
-import {getProductDetail} from '@/api/product'
+import {getProductDetail,updateItemQuantity,deleteItem} from '@/api/product'
 
 export default {
   name:'viewProduct',
@@ -80,7 +114,7 @@ export default {
 
       listLoading: true,
       itemList: [],
-      // productList: [],
+      editItem:{},
       inital_products:[],
       dialogFormVisible:false,
       currentDate: new Date(),
@@ -111,7 +145,8 @@ export default {
       getProductDetail(this.i_product.productId).then(response => {
         console.log(response);
         if(response.data.code == 1){
-          this.itemList=response.data.data.itemList;
+          this.itemList=[];
+          this.itemList.push(...response.data.data.itemList) ;
           this.i_product = response.data.data.product;
           console.log(this.itemList)
         }
@@ -133,14 +168,74 @@ export default {
       this.$router.push({path:'/pms/updateProduct',query:{edit_product: this.i_product}});
     },
     // 初始页currentPage、初始每页数据数pagesize和数据data
-            handleSizeChange: function (size) {
-                    this.pagesize = size;
-            console.log(this.pagesize)  //每页下拉显示数据
-            },
-            handleCurrentChange: function(currentPage){
-                    this.currentPage = currentPage;
-                    console.log(this.currentPage)  //点击第几页
-            },
+    handleSizeChange: function (size) {
+      this.pagesize = size;
+      console.log(this.pagesize)  //每页下拉显示数据
+    },
+    handleCurrentChange: function(currentPage){
+      this.currentPage = currentPage;
+      console.log(this.currentPage)  //点击第几页
+    },
+    handleEditQuantity(row){
+      this.dialogFormVisible = true;
+      this.editItem.quantity = row.quantity;
+      this.editItem.itemId = row.itemId;
+    },
+    handleConfirmEdit(){
+      updateItemQuantity(this.editItem.itemId,this.editItem.quantity).then(response => {
+        console.log(response);
+        if(response.data.code == 1){
+          this.getList();
+          this.$message({
+            message: '修改成功',
+            type: 'success',
+            duration:2000
+          });
+          this.dialogFormVisible = false;
+        }
+        else{
+          console.log(response.data.msg)
+        }
+      }).catch((response) => {
+        console.log(response);
+        this.loading = false
+      })
+    },
+    handleDeleteItem(row){
+      this.$confirm('此操作将永久删除该物品, 是否继续?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+              }).then(() => {
+                console.log("confirm")
+                this.doDelete(row.itemId);
+              }).catch(() => {
+                this.$message({
+                  type: 'info',
+                  message: '已取消删除'
+                });
+              });
+    },
+    doDelete(itemId){
+      deleteItem(itemId).then(response => {
+        console.log(response)
+        if(response.data.code == 1){
+          this.getList();
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          });
+        }
+        else if(response.data.code == 50001){
+          this.$message.error(response.data.msg);
+        }
+      }).catch((response) => {
+            this.loading = false;
+            console.log(response)
+         })
+    },
+    handleViewItem(row){
+    }
   }
 }
 </script>
@@ -200,5 +295,13 @@ export default {
       float: left;
       margin-right: 30px;
       border-top: 10px solid #C1CFE5;
+    }
+    .edit-item-form{
+      padding-left: 30px;
+      width: 400px;
+    }
+    .edit-item-dialog{
+      width: 800px;
+      margin-left: 300px;
     }
 </style>

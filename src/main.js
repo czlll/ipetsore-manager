@@ -27,10 +27,6 @@ Object.keys(globalFilter).forEach(key => {
 })
 
 router.beforeEach((to, from, next) => {
-  // console.log("to")
-  //     console.log( to);
-  //     console.log("from")
-  //     console.log(from);
     if (!store.state.user.status) {
         if (
             to.matched.length > 0 &&

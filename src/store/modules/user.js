@@ -1,7 +1,8 @@
+import Cookies from 'js-cookie'
+
 const user = {
   state: {
-    // token: getToken(),
-    status: false,
+    status: Cookies.get('login-status'),
     name: '',
     avatar: '',
     roles: []
@@ -9,11 +10,13 @@ const user = {
 
   mutations: {
     LOGIN_IN: state => {
-      state.status = true;
+      Cookies.set('login-status',1)
+      // state.status = true;
     },
 
     LOGIN_OUT: state => {
-      state.status = false;
+      Cookies.set('login-status','',-1)
+      // state.status = false;
     }
   },
 
@@ -21,6 +24,16 @@ const user = {
       dologin({commit,state}){
         return new Promise((resolve, reject) => {
             commit('LOGIN_IN')
+            resolve()
+          }).catch(error => {
+            reject(error)
+          })
+      },
+
+      dologout({commit,state}){
+
+        return new Promise((resolve, reject) => {
+            commit('LOGIN_OUT')
             resolve()
           }).catch(error => {
             reject(error)

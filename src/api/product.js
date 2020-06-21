@@ -35,22 +35,10 @@ export function getProducts(categoryIdList=[],name=null,pageNum=1, pageSize=6) {
   return  http.get(url)
 }
 
-//获取product下面的item信息
-export function getProductDetail(productId){
-  let url = "manager/products";
-  url = url + '/' + productId;
-  return  http.get(url)
-}
-
 //新增product
 export function addProduct(product, file){
   let url = "manager/products";
-  // url = url + '?' +
-  //       'productId='+ product.productId +
-  //       '&categoryId='+ product.categoryId +
-  //       '&name=' + product.name +
-  //       '&description=' + product.description+
-  //       '&imgUrl=' + product.imgUrl;
+
   var formData = new FormData()
   formData.append("categoryId", product.categoryId)
   formData.append("name", product.name)
@@ -73,4 +61,31 @@ export function updateProduct(product, file){
   var config = { headers: { 'Content-Type': 'multipart/form-data' } }
 
   return  http.put(url, formData, config)
+}
+
+//获取product下面的item信息
+export function getProductDetail(productId){
+  let url = "manager/products" + '/' + productId;
+  return  http.get(url)
+}
+
+//修改Item的库存
+export function updateItemQuantity(itemId,qty){
+  let url = "manager/products/items/" + itemId + '?qty=' + qty;
+  console.log(url)
+  return  http.patch(url)
+}
+
+//删除Item
+export function deleteItem(itemId){
+  let url = "manager/products/items/" + itemId;
+  console.log(url)
+  return  http.delete(url)
+}
+
+//新增Item
+export function addItem(item){
+  let url = "manager/products/items";
+  console.log(url)
+  return  http.delete(url,item)
 }
