@@ -4,8 +4,6 @@
              :rules="rules"
              ref="productFrom"
              label-width="150px">
-      <div style="overflow: hidden;">
-      <template style="float: left;">
       <el-form-item label="所属分类：" prop="selectedParent">
         <div class="block">
           <el-cascader
@@ -20,7 +18,7 @@
         <el-input-number v-model="edit_item.listPrice" :precision="1" :step="0.1" :min="0"></el-input-number>
       </el-form-item>
       <el-form-item label="unitCost：" prop="unitCost">
-         <el-input-number v-model="edit_item.unitCost" :precision="1" :step="0.1" :min="0"></el-input-number>
+        <el-input-number v-model="edit_item.unitCost" :precision="1" :step="0.1" :min="0"></el-input-number>
       </el-form-item>
       <el-form-item label="supplierId：" prop="supplierId">
         <el-input v-model="edit_item.supplierId"></el-input>
@@ -29,36 +27,21 @@
       <el-form-item label="quantity：" prop="quantity">
         <el-input-number v-model="edit_item.quantity" :min="0"></el-input-number>
       </el-form-item>
-      </template>
 
-<!--     <template v-if="isSelected" style="float: left;">
-        <el-card :body-style="{ padding: '10px'}" class="product-card">
-          <div style="overflow: hidden;">
-            <img :src="selectedParent[1].imgUrl" class="image">
-          <div style="padding: 20px; float: left;width: 258px;">
-            <p class="i-p"><span style="margin-right: 17px;">CategoryId: </span>{{selectedParent[1].categoryId}}</p>
-            <p class="i-p"><span style="margin-right: 31px;">ProductId:</span>{{selectedParent[1].productId}}</p>
-            <p class="i-p"><span style="margin-right: 57px;">Name:</span>{{ selectedParent[1].name}}</p>
-          </div>
-          </div>
-        </el-card>
-      </template> -->
-
-      </div>
-      <el-form-item label="attribute1：">
+      <el-form-item label="attribute1：" prop="attribute1">
         <el-input type="textarea" :autosize="true" v-model="edit_item.attribute1"></el-input>
       </el-form-item>
-      <el-form-item label="attribute2：">
-        <el-input type="textarea" :autosize="true" v-model="edit_item.attribute1"></el-input>
+      <el-form-item label="attribute2：" prop="attribute2">
+        <el-input type="textarea" :autosize="true" v-model="edit_item.attribute2"></el-input>
       </el-form-item>
-      <el-form-item label="attribute3：">
-        <el-input type="textarea" :autosize="true" v-model="edit_item.attribute1"></el-input>
+      <el-form-item label="attribute3：" prop="attribute3">
+        <el-input type="textarea" :autosize="true" v-model="edit_item.attribute3"></el-input>
       </el-form-item>
-      <el-form-item label="attribute4：">
-        <el-input type="textarea" :autosize="true" v-model="edit_item.attribute1"></el-input>
+      <el-form-item label="attribute4：" prop="attribute4">
+        <el-input type="textarea" :autosize="true" v-model="edit_item.attribute4"></el-input>
       </el-form-item>
-      <el-form-item label="attribute5：">
-        <el-input type="textarea" :autosize="true" v-model="edit_item.attribute1"></el-input>
+      <el-form-item label="attribute5：" prop="attribute5">
+        <el-input type="textarea" :autosize="true" v-model="edit_item.attribute5"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit('productFrom')">提交</el-button>
@@ -77,17 +60,17 @@
   import {addItem,getProducts} from '@/api/product'
 
   const defaultItem = {
-    product:{
-      productId:'',
-      name:'',
-      categoryId:'',
-      imgUrl:null,
-      description: ''
-    },
+    // product:{
+    //   productId:'',
+    //   name:'',
+    //   categoryId:'',
+    //   imgUrl:null,
+    //   description: ''
+    // },
     productId:'',
     listPrice:0,
     unitCost:0,
-    supplierId:0,
+    supplierId:null,
     status: '',
     quantity:'',
     attribute1:'',
@@ -159,8 +142,8 @@
               this.$message.warning(response.data.msg);
             }
           }).catch((response) => {
-                  console.log(response);
-                  this.loading = false
+            console.log(response);
+            this.loading = false
           });
           this.muiltCateList.push(firstLevel);
         })
@@ -173,70 +156,80 @@
         // this.fileList.push({'name':this.edit_product.name,'url':this.edit_product.imgUrl})
       },
       onSubmit(formName) {
-        this.$refs[formName].validate((valid) => {
-          if (valid) {
-            this.$confirm('是否提交数据', '提示', {
-              confirmButtonText: '确定',
-              cancelButtonText: '取消',
-              type: 'warning'
-            }).then(() => {
-              if(this.isEdit){
-                updateItem(this.editItem).then(response => {
-                  console.log(response);
-                  if(response.data.code == 1){
-                    this.$message({
-                      message: '修改成功',
-                      type: 'success',
-                      duration:2000
-                    });
-                  }
-                  else{
-                    this.$message({
-                      message: response.data.msg,
-                      type: 'warn',
-                      duration:2000
-                    });
-                  }
+        if(this.selectedParent[1] == null){
+          this.$message.warning('请选择所属分类')
+        }
+        else{
+          // this.edit_item.product = this.selectedParent[1];
+          this.edit_item.productId = this.selectedParent[1].productId;
+          console.log(this.edit_item.product)
+          this.$refs[formName].validate((valid) => {
+            if (valid) {
+              this.$confirm('是否提交数据', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+              }).then(() => {
+                if(this.isEdit){
+                  updateItem(this.editItem).then(response => {
+                    console.log(response);
+                    if(response.data.code == 1){
+                      this.$message({
+                        message: '修改成功',
+                        type: 'success',
+                        duration:2000
+                      });
+                    }
+                    else{
+                      this.$message({
+                        message: response.data.msg,
+                        type: 'warn',
+                        duration:2000
+                      });
+                    }
 
-                }).catch((response) => {
-                  console.log(response);
-                  this.loading = false
-                })
-              }
-              else{
-                addProduct(this.edit_product).then(response => {
-                  console.log(response);
-                  if(response.data.code == 1){
-                    this.$message({
-                      message: '添加成功',
-                      type: 'success',
-                      duration:2000
-                    });
-                  }
-                  else{
-                    this.$message({
-                      message: response.data.msg,
-                      type: 'warn',
-                      duration:2000
-                    });
-                  }
+                  }).catch((response) => {
+                    console.log(response);
+                    this.loading = false
+                  })
+                }
+                else{
+                  console.log(this.edit_item)
+                  addItem(this.edit_item).then(response => {
+                    console.log(response);
+                    if(response.data.code == 1){
+                      this.$message({
+                        message: '添加成功',
+                        type: 'success',
+                        duration:2000
+                      });
+                    }
+                    else{
+                      this.$message({
+                        message: response.data.msg,
+                        type: 'warn',
+                        duration:2000
+                      });
+                    }
 
-                }).catch((response) => {
-                  console.log(response);
-                  this.loading = false
-                })
-              }
-            });
+                  }).catch((response) => {
+                    console.log(response);
+                    this.loading = false
+                  })
+                }
+              });
 
-          } else {
-            this.$message({
-              message: '验证失败',
-              type: 'error',
-              duration: 1000
-            });
-            return false;
-          }
-        });
+            } else {
+              this.$message({
+                message: '验证失败',
+                type: 'error',
+                duration: 1000
+              });
+              return false;
+            }
+          });
+        }
+
       },
       resetForm(formName) {
         this.$confirm('是否清空数据', '提示', {
@@ -245,7 +238,7 @@
           type: 'warning'
         }).then(() => {
           this.$refs[formName].resetFields();
-          this.edit_product = Object.assign({}, defaultProduct);
+          this.edit_item = Object.assign({}, defaultItem);
           this.fileList = [];
         });
       },
@@ -275,7 +268,7 @@
         console.log(this.selectedParent);
         this.isSelected = true;
       }
-  },
+    },
   }
 </script>
 
@@ -317,13 +310,13 @@
     float: left;
   }
   .el-textarea {
-      position: relative;
-      display: inline-block;
-      width: 100% !important;
-      vertical-align: bottom;
-      font-size: 14px;
-      float: left !important;
-/*      min-height: 60px !important; */
+    position: relative;
+    display: inline-block;
+    width: 100% !important;
+    vertical-align: bottom;
+    font-size: 14px;
+    float: left !important;
+    /*      min-height: 60px !important; */
   }
   .el-radio-group{
     float: left;

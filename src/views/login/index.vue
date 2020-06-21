@@ -6,8 +6,7 @@
                :rules="loginRules"
                ref="loginForm"
                label-position="left">
-        <h2 class="login-title color-main">Hello, </h2>
-        <h2 class="login-title color-main">Welcome back</h2>
+        <h2 class="login-title color-main">Manager System Login</h2>
         <el-form-item prop="username">
           <el-input name="username"
                     type="text"
@@ -48,7 +47,7 @@
       </el-form>
     </div>
     <div class="pic-ch">
-      <el-carousel height="720px">
+      <el-carousel height="766px">
         <el-carousel-item v-for="pic in pics" :key="pic.id">
           <img :src="pic.src" style="width: 80%;height: 80%;margin-top: 10%;"/>
         </el-carousel-item>
@@ -183,12 +182,14 @@
       left: 0;
       right: 0;
       width: 300px;
-      margin-left: 100px;
-      margin-top: 140px;
+      margin-left: 150px;
+      margin-top: 190px;
       /* border-top: 10px solid #F0F4FF; */
     }
     .login-title {
       text-align: left;
+      margin-bottom: 15px;
+      font-weight: bold;
     }
 
     .login-center-layout {

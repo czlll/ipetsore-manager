@@ -76,6 +76,13 @@ export function updateItemQuantity(itemId,qty){
   return  http.patch(url)
 }
 
+//删除product
+export function deleteProduct(productId){
+  let url = "manager/products" + '/' + productId;
+  console.log(url)
+  return  http.delete(url)
+}
+
 //删除Item
 export function deleteItem(itemId){
   let url = "manager/products/items/" + itemId;
@@ -87,5 +94,5 @@ export function deleteItem(itemId){
 export function addItem(item){
   let url = "manager/products/items";
   console.log(url)
-  return  http.delete(url,item)
+  return  http.post(url,item)
 }

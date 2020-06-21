@@ -295,8 +295,9 @@ export default {
     }
 
     .image {
-      width: 100%;
-      margin-left: 15px;
+      width: 163px;
+      height: 163px;
+      margin: 15px 0 0px 15px;
       /* display: block; */
       /* float: left; */
     }

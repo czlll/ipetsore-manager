@@ -35,6 +35,7 @@ export default {
 body{
 	margin:0px ;
 	padding:0px;
+  background-color: #eeeeee;
 }
   .el-table__column-filter-trigger {
       display: inline-block;
